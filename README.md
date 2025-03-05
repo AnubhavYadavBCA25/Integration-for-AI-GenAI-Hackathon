@@ -1,1 +1,2 @@
-# Integration for AI/GenAI Hackathon
+# Integration for AI/GenAI Hackathon Prototype: Sankalp.AI
+
