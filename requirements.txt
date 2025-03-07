@@ -1,3 +1,8 @@
 streamlit
 google-generativeai
 streamlit-lottie
+python-dotenv
+fitz
+pyPDF2
+setuptools
+PyMuPDF
