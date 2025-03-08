@@ -8,8 +8,8 @@ import google.generativeai as genai
 
 load_dotenv()
 
-# GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-GOOGLE_API_KEY = os.getenv("GOOGLE_KEY_API")
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+# GOOGLE_API_KEY = os.getenv("GOOGLE_KEY_API")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Safety Settings
@@ -86,9 +86,10 @@ def extract_text_from_pdf(uploaded_file):
         return None
 
 # Function to analyze resume using Gemini AI
-def analyze_user_data(resume_text, model, performance_review, skill_rating):
+def analyze_user_data(resume_text, model, performance_review, skill_rating, job_role, existing_skills):
     chat = model.start_chat(history=[])
     prompt = f"""
+    You are an AI HR Specialist analyzing an employee working as a {job_role}.
     Analyze the following resume text, skill rating and performance review:
     Resume:
     {resume_text}
@@ -97,6 +98,8 @@ def analyze_user_data(resume_text, model, performance_review, skill_rating):
     {performance_review}
 
     Skill Rating: {skill_rating}
+
+    Existing Skills: {existing_skills}
     """
     response = chat.send_message(prompt, stream=True)
     extracted_info = ""
@@ -106,6 +109,23 @@ def analyze_user_data(resume_text, model, performance_review, skill_rating):
     return extracted_info
 
 st.header("Skill Mapping: Analyze Employee Skills with AI", divider='rainbow')
+
+# Ensure user data is available
+if "user_data" not in st.session_state or not st.session_state["user_data"]:
+    st.warning("Please log in and enter your details.")
+    st.stop()
+
+# Retrieve user details
+user_data = st.session_state["user_data"]
+user_name = user_data["name"]
+job_role = user_data["job_role"]
+current_skills = user_data["skills"]
+
+# UI Header
+st.title("🔍 AI-Powered Skill Mapping")
+st.write(f"**User:** {user_name}")
+st.write(f"**Job Role:** {job_role}")
+st.write(f"**Current Skills:** {current_skills}")
 
 with st.form(key='skill_mapping'):
     resume = st.file_uploader("Upload a Resume/CV*", type=['pdf'], help="Upload your resume/cv in PDF format")
@@ -130,13 +150,18 @@ with st.spinner("Processing..."):
     if resume:
         resume_text = extract_text_from_pdf(resume)
         if resume_text and performance_review and skill_rating:
-            analysis_result = analyze_user_data(resume_text, model, performance_review, skill_rating)
+            analysis_result = analyze_user_data(resume_text, model, performance_review, skill_rating, job_role, current_skills)
             def stream_output_ai_text():
                     for word in analysis_result.split(" "):
                         yield word + " "
                         time.sleep(0.02)
             st.subheader("Analysis Result:")
             st.write_stream(stream_output_ai_text())
+
+            # Save resume details & AI analysis in session state
+            st.session_state.user_data["resume_text"] = resume_text
+            st.session_state.user_data["skill_rating"] = skill_rating
+            st.session_state.user_data["skill_mapping_results"] = analysis_result
             
     else:
         st.warning("Please upload a resume to analyze")

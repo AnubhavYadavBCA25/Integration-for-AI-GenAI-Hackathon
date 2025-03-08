@@ -6,3 +6,6 @@ fitz
 pyPDF2
 setuptools
 PyMuPDF
+streamlit-authenticator
+plotly
+pandas

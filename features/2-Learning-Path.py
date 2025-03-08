@@ -49,50 +49,55 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash",
 
 # Ensure user data exists
 if "user_data" not in st.session_state or not st.session_state["user_data"]:
-    st.warning("Please log in and complete previous features first.")
+    st.warning("Please log in and complete Skill Mapping first.")
     st.stop()
 
-# Retrieve stored details from Features 1 & 2
+# Retrieve stored details from Feature 1
 user_data = st.session_state["user_data"]
 user_name = user_data["name"]
 job_role = user_data["job_role"]
 current_skills = user_data["skills"]
+resume_text = user_data.get("resume_text", "No resume data found")
 skill_rating = user_data.get("skill_rating", "Not rated")
 skill_analysis = user_data.get("skill_mapping_results", "No analysis found")
-learning_recommendations = user_data.get("learning_recommendations", "No learning data available")
 
 # UI Header
-st.header("📊 AI-Powered Skill Gap Analysis", divider='rainbow')
+st.header("📚 AI-Powered Learning Paths", divider='rainbow')
 st.write(f"**User:** {user_name}")
 st.write(f"**Job Role:** {job_role}")
 st.write(f"**Current Skills:** {current_skills}")
 st.write(f"**Skill Rating:** {skill_rating}/10")
+st.write(f"**Extracted Resume Data:** {resume_text[:500]}...")  # Show first 500 chars
 
-# AI Skill Gap Analysis
-def analyze_skill_gap(existing_skills, learning_paths, job_role, model):
+
+# AI Learning Recommendations
+def recommend_learning_path(existing_skills, missing_skills, job_role, model):
     prompt = f"""
-    You are an AI HR Expert analyzing skill gaps for a {job_role}.
+    You are an AI Career Coach helping a {job_role} upskill.
 
     - Current skills: {existing_skills}
-    - Suggested learning paths: {learning_paths}
+    - Identified skill gaps: {missing_skills}
 
-    Generate a **structured skill gap report**:
-    - Identify key missing skills.
-    - Provide industry benchmarks.
-    - Rate urgency levels (High, Medium, Low) for each missing skill.
+    Recommend a **personalized learning path**:
+    - **Online Courses**
+    - **Certifications**
+    - **Mentorship Programs**
+    - provide links to resources.
+
+    Provide difficulty levels (**Beginner, Intermediate, Advanced**) and estimated completion time.
     """
     response = model.generate_content(prompt)
     return response.text
 
-# Button to generate AI-powered skill gap analysis
-if st.button("🔍 Analyze Skill Gaps"):
-    with st.spinner("Analyzing Skill Gaps..."):
-        skill_gap_report = analyze_skill_gap(current_skills, learning_recommendations, job_role, model)
-        st.session_state.user_data["skill_gap_analysis"] = skill_gap_report  # Store for tracking
-
+# Button to get AI-powered learning recommendations
+if st.button("🎯 Get AI-Powered Learning Recommendations"):
+    with st.spinner("Generating Learning Recommendations..."):
+        learning_recs = recommend_learning_path(current_skills, skill_analysis, job_role, model)
+        st.session_state.user_data["learning_recommendations"] = learning_recs  # Store for tracking
+        
         def stream_output():
-            for word in skill_gap_report.split(" "):
+            for word in learning_recs.split(" "):
                 yield word + " "
                 time.sleep(0.02)
-        st.subheader(f"📌 AI-Generated Skill Gap Analysis for {user_name}")
+        st.subheader(f"📌 AI-Suggested Learning Paths for {user_name}")
         st.write_stream(stream_output())

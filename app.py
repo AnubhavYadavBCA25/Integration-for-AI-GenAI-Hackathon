@@ -1,10 +1,18 @@
 import streamlit as st
 import streamlit_lottie as st_lottie
 from features.functions import load_lottie_file
+from features.auth import authentication
 
 st.set_page_config(page_title="Sankalp.AI",
                    page_icon="🧊",
-                   layout="wide")
+                   layout="wide",
+                   initial_sidebar_state="expanded")
+
+# Initialize session state keys
+if 'register' not in st.session_state:
+    st.session_state['register'] = False
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
 
 def intro():
     st.header("Sankalp.AI: Empowering Skill Development with AI", divider="rainbow")
@@ -22,6 +30,8 @@ def intro():
                             3. Recommend personalized learning paths for upskilling.
                             4. Enhance workforce productivity through AI-driven insights.
                             5. Prepare for the future of work with AI-powered skill development.
+                            6. Connects with multiple data sources to create a unified skill profile.
+                            7. AI chatbot to guide users with career advice and job insights. 
                         
                             Sankalp.AI leverages the power of AI to provide a data-driven approach to employee skill development, enabling organizations to build a future-ready workforce.
                             With the help of Gemini Models, Sankalp.AI provides a unique solution to the challenges faced by organizations in identifying and developing employee skills.
@@ -29,7 +39,7 @@ def intro():
         
         with right_col:
             robot_ani = load_lottie_file("animations/robot_assist.json")
-            st_lottie.st_lottie(robot_ani, loop=True, height=430, width=400)
+            st_lottie.st_lottie(robot_ani, loop=True, height=480, width=400)
 
         
     with st.container(border=True):
@@ -58,17 +68,67 @@ def intro():
         with left_col:
             st.subheader("Features Offered🔥", divider='rainbow')
             st.markdown('''
-                            1. ✅ "AI-Powered Skill Mapping": Auto-identifies skills from resumes, reviews & learning data.
-                            2. ✅ "Personalized Learning Paths:" Recommends courses & mentorship based on skill gaps.
-                            3. ✅ "Real-Time Skill Gap Analysis:" Provides insights into current & future skill needs.
-                            4. ✅ "Seamless Data Integration:" Connects HR & LMS platforms for a unified employee profile.
-                            5. ✅ "Career Path Recommendations:" Suggests growth opportunities based on skills & goals.
+                            - 1️⃣ **SkillSync AI** – Automatically maps your skills from resumes, assessments, and performance data.
+
+                            - 2️⃣ **LearnTrack** – Get personalized learning paths with recommended courses, certifications, and resources.
+
+                            - 3️⃣ **GapInsight** – Identify missing skills by comparing your profile with industry benchmarks.
+
+                            - 4️⃣ **PathFinder AI** – Receive tailored career progression insights based on your skills and goals.
+
+                            - 5️⃣ **CareerBot** – AI-powered chatbot to guide you with career advice, skill enhancement, and job trends.
+
+                            - 6️⃣ **VisionBoard** – A dynamic, personalized dashboard with skill analytics and career insights.
+
+                            - 7️⃣ **JobRadar** – Find real-time job opportunities that match your skills and career aspirations.
                         ''')
         
         with right_col:
             feature_ani = load_lottie_file("animations/features.json")
-            st_lottie.st_lottie(feature_ani, loop=True, height=380, width=370)
+            st_lottie.st_lottie(feature_ani, loop=True, height=500, width=400)
     
+    with st.container(border=True):
+        left_col, right_col = st.columns(2)
+
+        with right_col:
+            st.subheader("📌 How to Use Sankalp.AI", divider='rainbow')
+            st.write("""
+            To get the best results, follow these steps in order. Sankalp.AI analyzes your skills, recommends learning paths, 
+            suggests career opportunities, and helps you find jobs based on your profile.
+            """)
+            # Step-wise Guide
+            steps = [
+                ("🔍 **Step 1: Skill Mapping (SkillSync AI)**", 
+                "Upload your resume, take a short self-assessment, and provide past performance reviews to map your skills."),
+                
+                ("📊 **Step 2: Analyze Your Skill Gaps (GapInsight)**", 
+                "Compare your current skills with industry benchmarks to identify areas for improvement."),
+                
+                ("🎯 **Step 3: Get a Personalized Learning Path (LearnTrack)**", 
+                "Receive AI-driven recommendations for courses, certifications, and resources to bridge your skill gaps."),
+                
+                ("🚀 **Step 4: Career Path Recommendation (PathFinder AI)**", 
+                "Explore career progression opportunities tailored to your skills and goals."),
+                
+                ("🤖 **Step 5: Career ChatBot Assistance (CareerBot)**", 
+                "Ask career-related queries, get industry insights, and receive AI-powered career guidance."),
+                
+                ("📈 **Step 6: View Your Dashboard (VisionBoard)**", 
+                "Access a personalized dashboard with real-time insights on skills, progress, and career suggestions."),
+                
+                ("💼 **Step 7: Find Jobs in Real-Time (JobRadar)**", 
+                "Discover job opportunities that match your skills and career aspirations.")
+            ]
+
+            # Display Steps in an Expandable Format
+            for step, description in steps:
+                with st.expander(step):
+                    st.write(description)
+        
+        with left_col:
+            working_ani = load_lottie_file("animations/working_ani.json")
+            st_lottie.st_lottie(working_ani, loop=True, height=650, width=450)
+
     with st.container(border=True):
         st.subheader("FAQs🤔", divider='rainbow')
 
@@ -92,16 +152,23 @@ def intro():
                             Sankalp.AI follows industry best practices to ensure the security and privacy of your data. We use encryption, access controls, and other security measures to protect your data from unauthorized access, disclosure, and misuse.
                         ''')
         
-        with st.expander("How to contact Sankalp.AI for more Information or Query?"):
+        with st.expander("Does Sankalp.AI provide Real-Time Job Opportunities Analysis?"):
             st.write('''
-                            You can contact Sankalp.AI by submitting a query through the Contact Us form on our website. Our team will get in touch with you to provide more information and address any queries you may have.
+                            Yes, Sankalp.AI offers real-time job opportunities analysis through the JobRadar feature. You can find job opportunities that match your skills and career aspirations, helping you stay updated with the latest job trends and openings.
                         ''')
             
+# Initialize session state for authentication
+authentication()
 
-
-pg = st.navigation([
-    st.Page(title="Home", page=intro, icon="🏠"),
-    st.Page(title="Skill Mapping", page="features/1-Skill-Mapping.py", icon="🔍"),
-    st.Page(title="Skill Gap Analysis", page="features/3-Real-Time-Skill-Analysis.py", icon="📈")
-])
-pg.run()
+if st.session_state["authentication_status"]:
+    pg = st.navigation([
+        st.Page(title="Home", page=intro, icon="🏠"),
+        st.Page(title="Skill Mapping", page="features/1-Skill-Mapping.py", icon="🔍"),
+        st.Page(title="Learning Paths", page="features/2-Learning-Path.py", icon="🛤"),
+        st.Page(title="Skill Gap Analysis", page="features/3-Real-Time-Skill-Analysis.py", icon="📈"),
+        st.Page(title="Career Path Recommendations", page="features/4-Career-Path.py", icon="🚀"),
+        st.Page(title="Career ChatBot", page="features/5-Career-ChatBot.py", icon="🤖"),
+        st.Page(title="Dashboard", page="features/6-Dashboard.py", icon="📊"),
+        st.Page(title="Job Analysis", page="features/7-Job-Analysis.py", icon="🔍"),
+    ])
+    pg.run()
