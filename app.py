@@ -102,5 +102,6 @@ def intro():
 pg = st.navigation([
     st.Page(title="Home", page=intro, icon="🏠"),
     st.Page(title="Skill Mapping", page="features/1-Skill-Mapping.py", icon="🔍"),
+    st.Page(title="Skill Gap Analysis", page="features/3-Real-Time-Skill-Analysis.py", icon="📈")
 ])
 pg.run()
