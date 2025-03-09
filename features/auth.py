@@ -69,7 +69,7 @@ def show_register_form():
         new_name = st.text_input("Enter Your Full Name")
         new_password = st.text_input("Enter Password", type="password")
         new_email = st.text_input("Enter Your Email")
-        new_job_role = st.selectbox("Job Role", ["Data Analyst", "Software Engineer", "HR Manager", "Sales Executive"])
+        new_job_role = st.text_input("Job Role", placeholder="e.g., Data Scientist, Software Engineer")
         new_skills = st.text_area("Enter Your Skills (comma-separated)")
         new_experience = st.number_input("Years of Experience", min_value=0, max_value=40, step=1)
 

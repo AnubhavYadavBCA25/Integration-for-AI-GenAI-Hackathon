@@ -86,20 +86,21 @@ def extract_text_from_pdf(uploaded_file):
         return None
 
 # Function to analyze resume using Gemini AI
-def analyze_user_data(resume_text, model, performance_review, skill_rating, job_role, existing_skills):
+def analyze_user_data(resume_text, model, skill_rating, job_role, existing_skills):
     chat = model.start_chat(history=[])
     prompt = f"""
-    You are an AI HR Specialist analyzing an employee working as a {job_role}.
-    Analyze the following resume text, skill rating and performance review:
-    Resume:
-    {resume_text}
+    You are an AI HR Specialist analyzing an employee working as a {job_role}. Provide content in table form.
 
-    Performance Review:
-    {performance_review}
+    - Current skills: {existing_skills}
+    - Skill self-rating: {skill_rating}/10
+    - Extracted resume content: {resume_text}
 
-    Skill Rating: {skill_rating}
+    Identify missing skills for career growth and categorize them into:
+    - **Technical Skills**
+    - **Soft Skills**
+    - **Industry Trends**
 
-    Existing Skills: {existing_skills}
+    Provide a priority score (1-10) based on demand.
     """
     response = chat.send_message(prompt, stream=True)
     extracted_info = ""
@@ -122,7 +123,7 @@ job_role = user_data["job_role"]
 current_skills = user_data["skills"]
 
 # UI Header
-st.title("🔍 AI-Powered Skill Mapping")
+st.subheader("🔍 AI-Powered Skill Mapping")
 st.write(f"**User:** {user_name}")
 st.write(f"**Job Role:** {job_role}")
 st.write(f"**Current Skills:** {current_skills}")
@@ -131,15 +132,13 @@ with st.form(key='skill_mapping'):
     resume = st.file_uploader("Upload a Resume/CV*", type=['pdf'], help="Upload your resume/cv in PDF format")
 
     skill_rating = st.slider("Rate your current skill level (1-10)*", 1, 10, 5, help="Rate your current skill level on a scale of 1-10")
-    
-    performance_review = st.text_area("Enter feedback from your manager or self-review*", placeholder="Enter feedback from your manager or self-review")
 
     st.markdown("*Required**")
     # Submit button
     submitted = st.form_submit_button("Submit")
 
 if submitted:
-    if not resume or not skill_rating or not performance_review:
+    if not resume or not skill_rating:
         st.error("Please Enter all the required fields")
         st.stop()
     else:
@@ -149,8 +148,8 @@ st.divider()
 with st.spinner("Processing..."):
     if resume:
         resume_text = extract_text_from_pdf(resume)
-        if resume_text and performance_review and skill_rating:
-            analysis_result = analyze_user_data(resume_text, model, performance_review, skill_rating, job_role, current_skills)
+        if resume_text and skill_rating:
+            analysis_result = analyze_user_data(resume_text, model, skill_rating, job_role, current_skills)
             def stream_output_ai_text():
                     for word in analysis_result.split(" "):
                         yield word + " "
