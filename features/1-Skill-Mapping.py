@@ -89,7 +89,7 @@ def extract_text_from_pdf(uploaded_file):
 def analyze_user_data(resume_text, model, skill_rating, job_role, existing_skills):
     chat = model.start_chat(history=[])
     prompt = f"""
-    You are an AI HR Specialist analyzing an employee working as a {job_role}. Provide content in table form.
+    You are an AI HR Specialist analyzing an employee working as a {job_role}.
 
     - Current skills: {existing_skills}
     - Skill self-rating: {skill_rating}/10
